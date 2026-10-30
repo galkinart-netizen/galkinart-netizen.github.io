@@ -1,0 +1,210 @@
+/* Палитра — та же «лагуна», что на обложке и карточках LinkedIn */
+:root {
+  --deep: #0a2230;
+  --lagoon: #0f3442;
+  --reef: #1c6670;
+  --mint: #66e3cb;
+  --foam: #e8f1ef;
+  --mist: #9db6b6;
+  --sand: #e9d9bc;
+  --line: rgba(232, 241, 239, 0.12);
+  --wrap: 1160px;
+  --gutter: clamp(16px, 4vw, 40px);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1100px 620px at 88% -8%, rgba(28, 102, 112, 0.55), transparent 70%),
+    var(--deep);
+  color: var(--foam);
+  font-family: "Geologica", system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; border-radius: 6px; }
+
+.wrap { width: 100%; max-width: calc(var(--wrap) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
+
+/* ---------- Шапка ---------- */
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-top: 22px; padding-bottom: 22px;
+}
+.mark {
+  font-weight: 700; font-size: 18px; letter-spacing: -0.02em; text-decoration: none;
+  display: inline-grid; place-items: center; width: 44px; height: 44px;
+  border: 1.5px solid var(--mint); border-radius: 12px; color: var(--mint);
+}
+.nav { display: flex; align-items: center; gap: clamp(14px, 3vw, 32px); font-size: 15px; font-weight: 400; }
+.nav a { text-decoration: none; color: var(--mist); }
+.nav a:hover { color: var(--foam); }
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.lang a, .lang span { padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 500; }
+.lang span { background: var(--foam); color: var(--deep); }
+@media (max-width: 640px) { .nav .hide-sm { display: none; } }
+
+/* ---------- Первый экран ---------- */
+.hero {
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
+  gap: clamp(28px, 5vw, 72px); align-items: end;
+  padding-top: clamp(28px, 6vw, 72px); padding-bottom: clamp(56px, 9vw, 112px);
+}
+.name {
+  margin: 0; font-weight: 800; line-height: 0.88; letter-spacing: -0.045em;
+  font-size: clamp(64px, 12.5vw, 168px);
+}
+.name span { display: block; }
+/* Фамилия сдвинута на ступень — тот же мотив, что у лестницы карьеры */
+.name span + span { padding-left: 0.62em; }
+.lead {
+  margin: clamp(24px, 3vw, 36px) 0 0; max-width: 30ch;
+  font-size: clamp(21px, 2.3vw, 28px); line-height: 1.32; font-weight: 400; letter-spacing: -0.01em;
+}
+.sub { margin: 18px 0 0; max-width: 52ch; color: var(--mist); }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 50px; padding: 0 24px;
+  border-radius: 999px; font: inherit; font-size: 16px; font-weight: 500; text-decoration: none;
+  border: 1.5px solid var(--line); color: var(--foam); transition: background-color .15s, border-color .15s;
+}
+.btn:hover { border-color: var(--mist); }
+.btn-main { background: var(--mint); border-color: var(--mint); color: var(--deep); }
+.btn-main:hover { background: #8aeedb; border-color: #8aeedb; }
+.btn svg { width: 19px; height: 19px; flex: none; }
+
+.portrait { margin: 0; justify-self: end; width: 100%; max-width: 420px; }
+.portrait img { border-radius: 28px; aspect-ratio: 4 / 5; object-fit: cover; width: 100%; }
+.portrait figcaption { margin-top: 14px; font-size: 14px; color: var(--mist); display: flex; align-items: center; gap: 8px; }
+.portrait figcaption svg { width: 16px; height: 16px; color: var(--sand); }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; }
+  .portrait { justify-self: start; max-width: 230px; grid-row: 1; }
+  .portrait img { border-radius: 22px; }
+}
+
+/* ---------- Разделы ---------- */
+.section {
+  padding-top: clamp(56px, 8vw, 104px); padding-bottom: clamp(56px, 8vw, 104px);
+  /* разделитель по ширине контента, а не всего блока с полями */
+  background: linear-gradient(var(--line), var(--line)) var(--gutter) 0 / calc(100% - 2 * var(--gutter)) 1px no-repeat;
+}
+.h2 {
+  margin: 0; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02;
+  font-size: clamp(36px, 5.4vw, 68px); max-width: 16ch;
+}
+.intro { margin: 18px 0 0; max-width: 56ch; color: var(--mist); }
+
+/* ---------- Лестница карьеры ---------- */
+.stairs {
+  list-style: none; margin: clamp(40px, 6vw, 72px) 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-items: end;
+}
+.step { display: flex; flex-direction: column; justify-content: flex-end; }
+.step-text { padding: 0 4px 16px; }
+.year { display: block; font-size: 14px; font-weight: 500; color: var(--sand); font-variant-numeric: tabular-nums; }
+.co { display: block; margin-top: 4px; font-size: 16px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+.role { display: block; margin-top: 3px; font-size: 13px; line-height: 1.35; color: var(--mist); }
+.win { display: block; margin-top: 10px; font-size: 14px; line-height: 1.4; }
+.win b { font-weight: 600; color: var(--mint); }
+.tread {
+  height: calc(36px + var(--i) * 34px);
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(180deg, rgba(28, 102, 112, 0.9), rgba(15, 52, 66, 0.6));
+  border-top: 2px solid rgba(102, 227, 203, 0.55);
+  transform-origin: bottom;
+}
+.step.now .tread { background: linear-gradient(180deg, var(--mint), rgba(102, 227, 203, 0.25)); border-top-color: var(--mint); }
+
+/* Одно движение на странице: ступени вырастают по очереди */
+.js .stairs .tread { transform: scaleY(0); }
+.js .stairs.is-in .tread { transform: scaleY(1); transition: transform .7s cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--i) * 90ms); }
+@media (prefers-reduced-motion: reduce) {
+  .js .stairs .tread, .js .stairs.is-in .tread { transform: none; transition: none; }
+}
+
+@media (max-width: 960px) {
+  .stairs { grid-template-columns: 1fr; gap: 26px; }
+  .step { flex-direction: column-reverse; }
+  .step-text { padding: 12px 0 0; }
+  .tread { height: 10px; width: calc(22% + var(--i) * 13%); border-radius: 0 6px 6px 0; border-top: 0; }
+  .js .stairs .tread { transform: scaleX(0); transform-origin: left; }
+  .js .stairs.is-in .tread { transform: scaleX(1); }
+}
+
+/* ---------- Проекты ---------- */
+.featured { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: clamp(36px, 5vw, 56px); }
+.more { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 20px; }
+.tile {
+  display: flex; flex-direction: column; background: var(--lagoon); border-radius: 24px;
+  padding: clamp(18px, 2vw, 24px); border: 1px solid var(--line);
+}
+.shot { border-radius: 12px; aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; width: 100%; margin-bottom: 22px; background: var(--deep); }
+.tile-head { display: flex; align-items: center; gap: 14px; }
+.logo {
+  flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+  font-weight: 700; font-size: 15px; color: #fff; background: var(--c, var(--reef));
+}
+.tile h3 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.what { display: block; margin-top: 2px; font-size: 14px; color: var(--mist); line-height: 1.35; }
+.tile p { margin: 14px 0 0; font-size: 15.5px; line-height: 1.55; }
+.tile-foot { margin-top: auto; padding-top: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.state { font-size: 13px; color: var(--mist); display: inline-flex; align-items: center; gap: 8px; }
+.state::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--mint); }
+.state.closed::before { background: var(--sand); }
+.state.paused::before { background: transparent; border: 1.5px solid var(--mist); }
+.go { min-height: 42px; padding: 0 18px; font-size: 15px; }
+
+@media (max-width: 960px) { .more { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 680px) { .featured, .more { grid-template-columns: 1fr; } }
+
+.inside { margin-top: clamp(40px, 5vw, 56px); }
+.inside h3 { margin: 0 0 6px; font-size: 20px; font-weight: 600; letter-spacing: -0.015em; }
+.inside > p { margin: 0; color: var(--mist); font-size: 15px; }
+.rows { list-style: none; margin: 18px 0 0; padding: 0; }
+.rows li {
+  display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) auto; gap: 8px 28px; align-items: baseline;
+  padding: 18px 0; border-top: 1px solid var(--line);
+}
+.rows li:last-child { border-bottom: 1px solid var(--line); }
+.rows b { font-weight: 600; }
+.rows span { font-size: 15.5px; color: var(--mist); }
+@media (max-width: 760px) {
+  .rows li { grid-template-columns: 1fr; gap: 4px; }
+}
+
+/* ---------- Как я работаю ---------- */
+.how { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(28px, 4vw, 56px) clamp(28px, 5vw, 80px); margin-top: clamp(36px, 5vw, 56px); }
+.how h3 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+.how p { margin: 10px 0 0; color: var(--mist); max-width: 46ch; }
+@media (max-width: 680px) { .how { grid-template-columns: 1fr; } }
+
+.facts { margin: clamp(48px, 6vw, 72px) 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.facts div { border-top: 1px solid var(--line); padding-top: 16px; }
+.facts dt { font-size: 14px; color: var(--sand); }
+.facts dd { margin: 6px 0 0; font-size: 15.5px; }
+@media (max-width: 760px) { .facts { grid-template-columns: 1fr; } }
+
+/* ---------- Контакты ---------- */
+.contact { padding-bottom: clamp(56px, 8vw, 96px); }
+.contact .h2 { max-width: 14ch; }
+.contact .actions { margin-top: 36px; }
+
+.foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+  padding-top: 24px; padding-bottom: 32px;
+  background: linear-gradient(var(--line), var(--line)) var(--gutter) 0 / calc(100% - 2 * var(--gutter)) 1px no-repeat;
+  font-size: 13px; color: var(--mist);
+}
