@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/style.css">
-  <script>document.documentElement.classList.add('js')</script>
+  <script>var d=document.documentElement;d.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('motion')</script>
 </head>
 <body>
 
@@ -205,7 +205,7 @@
     </div>
 
     <article class="tile wide">
-      <img class="shot" src="assets/thaistat-en.jpg" width="1200" height="750" alt="ThaiStat: Shopee Thailand analytics" loading="lazy">
+      <img class="shot" src="../assets/thaistat-en.jpg" width="1200" height="750" alt="ThaiStat: Shopee Thailand analytics" loading="lazy">
       <div class="tile-body">
         <div class="tile-head">
           <span class="logo" style="--c:#ff5a5f" aria-hidden="true">TS</span>
@@ -275,13 +275,6 @@
   <span>I built this site with AI too</span>
 </footer>
 
-<script>
-  var s = document.querySelector('.stairs');
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (e, o) {
-      if (e[0].isIntersecting) { s.classList.add('is-in'); o.disconnect(); }
-    }, { threshold: 0.25 }).observe(s);
-  } else { s.classList.add('is-in'); }
-</script>
+<script src="../assets/motion.js"></script>
 </body>
 </html>

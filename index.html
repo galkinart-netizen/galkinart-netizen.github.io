@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
-  <script>document.documentElement.classList.add('js')</script>
+  <script>var d=document.documentElement;d.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('motion')</script>
 </head>
 <body>
 
@@ -275,13 +275,6 @@
   <span>Этот сайт я тоже собрал с ИИ</span>
 </footer>
 
-<script>
-  var s = document.querySelector('.stairs');
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (e, o) {
-      if (e[0].isIntersecting) { s.classList.add('is-in'); o.disconnect(); }
-    }, { threshold: 0.25 }).observe(s);
-  } else { s.classList.add('is-in'); }
-</script>
+<script src="assets/motion.js"></script>
 </body>
 </html>

@@ -119,7 +119,7 @@ a { color: inherit; }
   display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-items: end;
 }
 .step { display: flex; flex-direction: column; justify-content: flex-end; }
-.step-text { padding: 0 4px 16px; }
+.step-text { padding: 0 4px 30px; }
 .year { display: block; font-size: 14px; font-weight: 500; color: var(--warm); font-variant-numeric: tabular-nums; }
 .co { display: block; margin-top: 4px; font-size: 16px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
 .role { display: block; margin-top: 3px; font-size: 13px; line-height: 1.35; color: var(--muted); }
@@ -134,20 +134,12 @@ a { color: inherit; }
 }
 .step.now .tread { background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 25%, var(--bg))); border-top-color: var(--accent); }
 
-/* Одно движение на странице: ступени вырастают по очереди */
-.js .stairs .tread { transform: scaleY(0); }
-.js .stairs.is-in .tread { transform: scaleY(1); transition: transform .7s cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--i) * 90ms); }
-@media (prefers-reduced-motion: reduce) {
-  .js .stairs .tread, .js .stairs.is-in .tread { transform: none; transition: none; }
-}
-
 @media (max-width: 960px) {
   .stairs { grid-template-columns: 1fr; gap: 26px; }
   .step { flex-direction: column-reverse; }
   .step-text { padding: 12px 0 0; }
   .tread { height: 10px; width: calc(22% + var(--i) * 13%); border-radius: 0 6px 6px 0; border-top: 0; }
-  .js .stairs .tread { transform: scaleX(0); transform-origin: left; }
-  .js .stairs.is-in .tread { transform: scaleX(1); }
+  .tread { transform-origin: left; }
 }
 
 /* ---------- Проекты ---------- */
@@ -218,4 +210,106 @@ a { color: inherit; }
   padding-top: 24px; padding-bottom: 32px;
   background: linear-gradient(var(--line), var(--line)) var(--gutter) 0 / calc(100% - 2 * var(--gutter)) 1px no-repeat;
   font-size: 13px; color: var(--muted);
+}
+
+/* ---------- Движение ----------
+   Всё ниже включается только классом .motion, который ставит motion.js,
+   и только если в системе не просили «уменьшить движение». Без скрипта сайт просто статичный. */
+
+/* Шапка прилипает и становится матовой после начала прокрутки */
+.top { position: sticky; top: 0; z-index: 50; }
+.top::before {
+  content: ""; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+  border-bottom: 1px solid var(--line); opacity: 0; transition: opacity .25s;
+}
+.top.scrolled::before { opacity: 1; }
+html, body { overflow-x: clip; }
+.progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60; pointer-events: none;
+  background: linear-gradient(90deg, var(--accent), #6f8cff); transform-origin: left; transform: scaleX(0);
+}
+
+/* Первый экран: мягкое пятно света плавает за фото */
+.hero { position: relative; isolation: isolate; }
+.motion .hero::before {
+  content: ""; position: absolute; z-index: -1; width: min(620px, 80vw); aspect-ratio: 1; right: 0; top: -6%;
+  border-radius: 50%; filter: blur(60px); opacity: .55;
+  background: radial-gradient(circle at 40% 40%, color-mix(in srgb, var(--accent) 45%, transparent), transparent 65%);
+  animation: drift 18s ease-in-out infinite alternate;
+}
+@keyframes drift { to { transform: translate(-14%, 18%) scale(1.15); } }
+
+/* Первый экран: появление при загрузке */
+.motion .hero .name span, .motion .hero .lead, .motion .hero .sub, .motion .hero .actions, .motion .portrait figcaption {
+  animation: blurIn .9s cubic-bezier(.2, .7, .2, 1) both; animation-delay: var(--d, 0ms);
+}
+.motion .hero .name span:nth-child(1) { --d: 80ms; }
+.motion .hero .name span:nth-child(2) { --d: 220ms; }
+.motion .hero .lead { --d: 420ms; }
+.motion .hero .sub { --d: 520ms; }
+.motion .hero .actions { --d: 620ms; }
+.motion .portrait figcaption { --d: 900ms; }
+@keyframes blurIn { from { opacity: 0; transform: translateY(.45em); filter: blur(10px); } }
+.motion .portrait img { animation: photoIn 1.2s cubic-bezier(.2, .7, .2, 1) 150ms both; }
+@keyframes photoIn {
+  from { clip-path: inset(100% 0 0 0 round 28px); transform: scale(1.12); }
+  to { clip-path: inset(0 0 0 0 round 28px); transform: scale(1); }
+}
+
+/* Блоки проявляются, когда до них долистали */
+.motion .rv { opacity: 0; transform: translateY(36px); transition: opacity .8s cubic-bezier(.2, .7, .2, 1), transform .8s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0ms); }
+.motion .rv.in { opacity: 1; transform: none; }
+.motion .h2.rv { transform: translateY(28px); filter: blur(8px); transition: opacity .8s cubic-bezier(.2, .7, .2, 1), transform .8s cubic-bezier(.2, .7, .2, 1), filter .8s; }
+.motion .h2.rv.in { transform: none; filter: none; }
+
+/* Карточки проектов: приподнимаются и подсвечиваются за курсором */
+@media (hover: hover) {
+  .tile { transition: transform .35s cubic-bezier(.2, .7, .2, 1), box-shadow .35s, border-color .35s, opacity .8s cubic-bezier(.2, .7, .2, 1); }
+  .motion .rv.tile { transition: transform .8s cubic-bezier(.2, .7, .2, 1), opacity .8s cubic-bezier(.2, .7, .2, 1), box-shadow .35s, border-color .35s; }
+  .tile:hover, .motion .rv.in.tile:hover {
+    transform: translateY(-6px); border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    box-shadow: 0 24px 50px -24px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  .tile { background-image: radial-gradient(480px circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--accent) 9%, transparent), transparent 60%); }
+  .btn { transition: background-color .15s, border-color .15s, transform .2s; }
+  .btn:hover { transform: translateY(-2px); }
+}
+
+/* Кнопка Telegram внизу трижды «зовёт», когда до неё долистали */
+.btn-main { position: relative; }
+.motion .contact.in .btn-main::after {
+  content: ""; position: absolute; inset: -2px; border-radius: inherit; border: 2px solid var(--accent);
+  animation: ping 1.8s cubic-bezier(.2, .7, .2, 1) 600ms 3 both; pointer-events: none;
+}
+@keyframes ping { from { opacity: .7; transform: scale(1); } to { opacity: 0; transform: scale(1.35, 1.7); } }
+
+/* Лестница: шаги, точка-«прыгун» и салют на вершине (сами движения задаёт motion.js) */
+.stairs { position: relative; }
+.motion .stairs.armed .step-text { opacity: 0; transform: translateY(14px); }
+.motion .stairs.armed .tread { transform: scaleY(0); }
+@media (max-width: 960px) { .motion .stairs.armed .tread { transform: scaleX(0); } .hopper { display: none; } }
+.motion .stairs.done .step-text { opacity: 1; transform: none; }
+.motion .stairs.done .tread { transform: none; }
+.hopper {
+  position: absolute; left: 0; top: 0; width: 22px; height: 22px; margin: -22px 0 0 -11px; z-index: 2;
+  border-radius: 50%; background: var(--accent); border: 4px solid var(--surface);
+  box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--accent) 70%, transparent); pointer-events: none;
+  transform-origin: 50% 100%; opacity: 0;
+}
+.hopper.home::after {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--accent);
+  animation: ping 2.4s ease-out infinite;
+}
+.spark { position: absolute; left: 0; top: 0; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; pointer-events: none; z-index: 1; }
+.step.now.peak .tread { animation: peak 1.4s ease-out 2; }
+@keyframes peak {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+  100% { box-shadow: 0 0 0 22px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top::before { transition: none; }
+  .progress, .hopper, .spark { display: none; }
 }
