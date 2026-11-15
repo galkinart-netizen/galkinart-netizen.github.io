@@ -172,67 +172,120 @@
     }, end);
   }
 
-  // ---------- Телефон: линия времени, которая заполняется вслед за прокруткой ----------
-  function scrollTimeline() {
+  // ---------- Телефон: лестница листается пальцем, точка прыгает на ступень в центре ----------
+  function swipeStairs() {
     var last = steps.length - 1;
-    var rail = document.createElement('span');
-    rail.className = 'rail';
-    rail.setAttribute('aria-hidden', 'true');
-    stairs.insertBefore(rail, stairs.firstChild);
-    var lit = -1, finished = false, shown = false;
+    var ru = (document.documentElement.lang || 'ru').indexOf('en') !== 0;
+    var dots = document.createElement('div');
+    dots.className = 'stairs-dots';
+    var hint = document.createElement('p');
+    hint.className = 'stairs-hint';
+    hint.textContent = ru ? 'Листайте ступени ←  →' : 'Swipe through the steps ←  →';
+    steps.forEach(function (step, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', step.querySelector('.year').textContent + ' ' + step.querySelector('.co').textContent);
+      b.addEventListener('click', function () { go(i); });
+      dots.appendChild(b);
+    });
+    stairs.after(dots, hint);
 
-    function dotY(i) { return steps[i].getBoundingClientRect().top - stairs.getBoundingClientRect().top + 5; }
+    var cur = -1, started = false, peaked = false;
 
-    function reveal(i, lag) {
-      var step = steps[i];
-      step.classList.add('lit');
-      step.querySelector('.tread').animate(
-        [{ transform: 'scaleX(0)' }, { transform: 'none' }],
-        { duration: 700, delay: lag, easing: 'cubic-bezier(.34,1.45,.64,1)', fill: 'forwards' });
-      step.querySelector('.step-text').animate(
-        [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }],
-        { duration: 520, delay: lag + 120, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards' });
-      counters[i].forEach(function (c) { countUp(c, lag + 200, 900); });
+    // Верх полосы ступени без учёта уменьшения соседних ступеней
+    function mspot(i) {
+      var st = steps[i], t = st.querySelector('.tread');
+      return { x: st.offsetLeft + st.offsetWidth / 2, y: st.offsetTop + st.offsetHeight - t.offsetHeight };
+    }
+
+    function go(i) {
+      var s = steps[i];
+      stairs.scrollTo({ left: s.offsetLeft + s.offsetWidth / 2 - stairs.clientWidth / 2, behavior: 'smooth' });
+    }
+
+    function nearest() {
+      var mid = stairs.scrollLeft + stairs.clientWidth / 2, best = 0, d = Infinity;
+      steps.forEach(function (s, i) {
+        var dd = Math.abs(s.offsetLeft + s.offsetWidth / 2 - mid);
+        if (dd < d) { d = dd; best = i; }
+      });
+      return best;
+    }
+
+    function select(i) {
+      if (i === cur) return;
+      var prev = cur;
+      cur = i;
+      steps.forEach(function (s, k) { s.classList.toggle('cur', k === i); });
+      Array.prototype.forEach.call(dots.children, function (b, k) {
+        if (k === i) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+      });
+      if (!started) return;
+      hopper.classList.remove('home');
+      if (prev < 0) {
+        var t = mspot(i);
+        hopper.animate([{ opacity: 0, transform: at({ x: t.x, y: t.y - 40 }) }, { opacity: 1, transform: at(t) }],
+          { duration: 450, easing: 'cubic-bezier(.34,1.45,.64,1)', fill: 'forwards' });
+      } else {
+        hop(mspot(prev), mspot(i), 0);
+        hint.classList.add('gone');
+      }
       if (i === last) {
         setTimeout(function () {
-          step.classList.add('peak');
+          if (cur !== last) return;
           hopper.classList.add('home');
-          burst({ x: 11, y: dotY(last) + 11 });
-          stairs.classList.add('done');
-        }, lag + 650);
+          if (!peaked) {
+            peaked = true;
+            steps[last].classList.add('peak');
+            burst(mspot(last));
+          }
+        }, 520);
       }
+    }
+
+    function start() {
+      started = true;
+      stairs.classList.add('swipe');
+      steps.forEach(function (step, i) {
+        var T = i * 110;
+        step.querySelector('.tread').animate(
+          [{ transform: 'scaleY(0)' }, { transform: 'none' }],
+          { duration: 620, delay: T, easing: 'cubic-bezier(.34,1.45,.64,1)', fill: 'forwards' });
+        step.querySelector('.step-text').animate(
+          [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }],
+          { duration: 500, delay: T + 180, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards' });
+        counters[i].forEach(function (c) { countUp(c, T + 240, 900); });
+      });
+      setTimeout(function () {
+        stairs.classList.add('done');
+        var i = cur < 0 ? nearest() : cur;
+        cur = -1;
+        select(i);
+      }, 6 * 110 + 520);
     }
 
     var ticking = false;
-    function update() {
-      ticking = false;
-      var top = dotY(0), h = dotY(last) - top;
-      var r = stairs.getBoundingClientRect();
-      var line = window.innerHeight * 0.85;
-      var p = Math.max(0, Math.min(1, (line - r.top - top) / h));
-      rail.style.top = top + 'px';
-      rail.style.height = h + 'px';
-      rail.style.transform = 'scaleY(' + p + ')';
-      if (!shown && r.top < window.innerHeight) {
-        shown = true;
-        hopper.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
-      }
-      hopper.style.transform = 'translate(11px,' + (top + p * h) + 'px)';
-      var reach = -1;
-      for (var i = 0; i <= last; i++) if (dotY(i) - top <= p * h + 2) reach = i;
-      var batch = 0;
-      while (lit < reach) { lit++; reveal(lit, batch++ * 140); }
-      steps.forEach(function (s, i) { s.classList.toggle('cur', i === lit); });
-      if (lit === last) finished = true;
-    }
-    function onMove() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
-    window.addEventListener('scroll', onMove, { passive: true });
-    window.addEventListener('resize', onMove);
-    update();
+    stairs.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; select(nearest()); });
+    }, { passive: true });
+
+    window.addEventListener('resize', function () {
+      if (cur < 0 || !started) return;
+      hopper.getAnimations().forEach(function (a) { a.cancel(); });
+      hopper.style.opacity = 1;
+      hopper.style.transform = at(mspot(cur));
+    });
+
+    select(0);
+    new IntersectionObserver(function (entries, obs) {
+      if (entries[0].isIntersecting) { obs.disconnect(); start(); }
+    }, { threshold: 0.35 }).observe(stairs);
   }
 
   if (window.matchMedia('(max-width: 960px)').matches) {
-    scrollTimeline();
+    swipeStairs();
     return;
   }
 
