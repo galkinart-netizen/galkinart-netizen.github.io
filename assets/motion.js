@@ -172,6 +172,70 @@
     }, end);
   }
 
+  // ---------- Телефон: линия времени, которая заполняется вслед за прокруткой ----------
+  function scrollTimeline() {
+    var last = steps.length - 1;
+    var rail = document.createElement('span');
+    rail.className = 'rail';
+    rail.setAttribute('aria-hidden', 'true');
+    stairs.insertBefore(rail, stairs.firstChild);
+    var lit = -1, finished = false, shown = false;
+
+    function dotY(i) { return steps[i].getBoundingClientRect().top - stairs.getBoundingClientRect().top + 5; }
+
+    function reveal(i, lag) {
+      var step = steps[i];
+      step.classList.add('lit');
+      step.querySelector('.tread').animate(
+        [{ transform: 'scaleX(0)' }, { transform: 'none' }],
+        { duration: 700, delay: lag, easing: 'cubic-bezier(.34,1.45,.64,1)', fill: 'forwards' });
+      step.querySelector('.step-text').animate(
+        [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }],
+        { duration: 520, delay: lag + 120, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards' });
+      counters[i].forEach(function (c) { countUp(c, lag + 200, 900); });
+      if (i === last) {
+        setTimeout(function () {
+          step.classList.add('peak');
+          hopper.classList.add('home');
+          burst({ x: 11, y: dotY(last) + 11 });
+          stairs.classList.add('done');
+        }, lag + 650);
+      }
+    }
+
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var top = dotY(0), h = dotY(last) - top;
+      var r = stairs.getBoundingClientRect();
+      var line = window.innerHeight * 0.85;
+      var p = Math.max(0, Math.min(1, (line - r.top - top) / h));
+      rail.style.top = top + 'px';
+      rail.style.height = h + 'px';
+      rail.style.transform = 'scaleY(' + p + ')';
+      if (!shown && r.top < window.innerHeight) {
+        shown = true;
+        hopper.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards' });
+      }
+      hopper.style.transform = 'translate(11px,' + (top + p * h) + 'px)';
+      var reach = -1;
+      for (var i = 0; i <= last; i++) if (dotY(i) - top <= p * h + 2) reach = i;
+      var batch = 0;
+      while (lit < reach) { lit++; reveal(lit, batch++ * 140); }
+      steps.forEach(function (s, i) { s.classList.toggle('cur', i === lit); });
+      if (lit === last) finished = true;
+    }
+    function onMove() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', onMove, { passive: true });
+    window.addEventListener('resize', onMove);
+    update();
+  }
+
+  if (window.matchMedia('(max-width: 960px)').matches) {
+    scrollTimeline();
+    return;
+  }
+
   // Когда меняется размер окна, точка остаётся на вершине
   var resizeTimer;
   window.addEventListener('resize', function () {

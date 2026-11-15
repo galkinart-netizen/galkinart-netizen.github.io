@@ -135,11 +135,26 @@ a { color: inherit; }
 .step.now .tread { background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 25%, var(--bg))); border-top-color: var(--accent); }
 
 @media (max-width: 960px) {
-  .stairs { grid-template-columns: 1fr; gap: 26px; }
-  .step { flex-direction: column-reverse; }
+  /* Телефон: вертикальная линия времени. Слева рельс с точками, полоса над каждой ступенью растёт с карьерой */
+  .stairs { grid-template-columns: 1fr; gap: 34px; padding-left: 36px; }
+  .stairs::before {
+    content: ""; position: absolute; left: 10px; top: 5px; bottom: 0; width: 2px; border-radius: 2px;
+    background: linear-gradient(180deg, var(--line), color-mix(in srgb, var(--line) 30%, transparent));
+  }
+  .step { position: relative; flex-direction: column-reverse; }
+  .step::before {
+    content: ""; position: absolute; left: -33px; top: -2px; width: 14px; height: 14px; box-sizing: border-box;
+    border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); box-shadow: 0 0 0 2px var(--accent);
+    transition: background .35s, box-shadow .35s, transform .35s cubic-bezier(.34,1.6,.64,1);
+  }
   .step-text { padding: 12px 0 0; }
+  .year { font-size: 15px; }
+  .co { font-size: 19px; }
+  .role { font-size: 14px; }
+  .win { font-size: 15px; }
   .tread { height: 10px; width: calc(22% + var(--i) * 13%); border-radius: 0 6px 6px 0; border-top: 0; }
   .tread { transform-origin: left; }
+  .step.now .co { color: var(--accent); }
 }
 
 /* ---------- Проекты ---------- */
@@ -289,7 +304,16 @@ html, body { overflow-x: clip; }
 .stairs { position: relative; }
 .motion .stairs.armed .step-text { opacity: 0; transform: translateY(14px); }
 .motion .stairs.armed .tread { transform: scaleY(0); }
-@media (max-width: 960px) { .motion .stairs.armed .tread { transform: scaleX(0); } .hopper { display: none; } }
+@media (max-width: 960px) {
+  .motion .stairs.armed .tread { transform: scaleX(0); }
+  .motion .stairs.armed .step:not(.lit)::before { background: var(--bg); box-shadow: 0 0 0 2px var(--line); }
+  .motion .stairs .step.lit::before { transform: scale(1.15); }
+  .hopper { width: 18px; height: 18px; margin: -9px 0 0 -9px; border-width: 3px; }
+  .rail { position: absolute; left: 10px; width: 2px; border-radius: 2px; background: linear-gradient(180deg, var(--tread), var(--accent)); transform-origin: top; transform: scaleY(0); pointer-events: none; }
+  .motion .stairs.done .step.now::before { opacity: 0; }
+  .step.cur .tread { box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--accent) 70%, transparent); }
+}
+@media (min-width: 961px) { .rail { display: none; } }
 .motion .stairs.done .step-text { opacity: 1; transform: none; }
 .motion .stairs.done .tread { transform: none; }
 .hopper {
