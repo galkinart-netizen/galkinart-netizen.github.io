@@ -92,6 +92,12 @@ a { color: inherit; }
 .btn.icon { width: 60px; height: 60px; min-height: 60px; padding: 0; justify-content: center; }
 .btn.icon svg { width: 26px; height: 26px; }
 .socials { gap: 14px; }
+.btn.icon.tg, .btn.icon.li, .btn.icon.ig { color: #fff; border: 0; box-shadow: 0 10px 22px -12px rgba(14, 27, 44, .55); }
+.btn.icon.tg { background: #229ED9; }
+.btn.icon.li { background: #0A66C2; }
+.btn.icon.ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+.btn.icon.tg:hover, .btn.icon.li:hover, .btn.icon.ig:hover { filter: brightness(1.08); border: 0; }
+.motion .contact.in .btn.icon.tg::after { border-color: #229ED9; }
 @media (max-width: 680px) { .socials { justify-content: space-between; } .btn.icon { width: 68px; height: 68px; } }
 .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
